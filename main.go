@@ -11,16 +11,23 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func helloWorld(w http.ResponseWriter, req *http.Request) {
+		fmt.Println("you made here", w)
+	}
+
+
+func main() {
+	fmt.Println("Server listening on 8080")
+	r := mux.NewRouter()
+	r.PathPrefix("/").Handler(http.FileServer(rice.MustFindBox("root").HTTPBox()))
+	r.HandleFunc("/go", helloWorld).Methods("GET")
+	log.Fatal(http.ListenAndServe(getPort(), handlers.CORS(handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD"}), handlers.AllowedOrigins([]string{"*"}))(r)))
+}
+
 func getPort() string {
 	p := os.Getenv("PORT")
 	if p != "" {
 		return ":" + p
 	}
 	return ":8080"
-}
-func main() {
-	fmt.Println("Server listening on 8080")
-	router := mux.NewRouter()
-	router.PathPrefix("/").Handler(http.FileServer(rice.MustFindBox("root").HTTPBox()))
-	log.Fatal(http.ListenAndServe(getPort(), handlers.CORS(handlers.AllowedMethods([]string{"GET", "POST", "PUT", "HEAD"}), handlers.AllowedOrigins([]string{"*"}))(router)))
 }
